@@ -4,6 +4,7 @@ import {Router} from '@angular/router'
 import { UsersService } from '../users.service';
 import {first} from 'rxjs/operators';
 import { ValidateForm } from 'src/app/helpers/validateform';
+import { NgToastModule, NgToastService } from 'ng-angular-popup';
 @Component({
   selector: 'app-login',
   templateUrl: './signup.component.html',
@@ -17,7 +18,8 @@ angForm!:FormGroup;
 constructor(
 private fb:FormBuilder,
 private route:Router,
-private auth: UsersService
+private auth: UsersService,
+private toast:NgToastService
 )
 {
 }
@@ -41,11 +43,24 @@ onSignup(){
   if(this.angForm.valid){
    this.auth.signUp(this.angForm.value).subscribe({
     next:(res=>{
-      alert(res.Message);
-      this.angForm.reset();
-      if(res.Message=="Register success !")
-      this.route.navigate(['login'])
+      if(res.Message=="Register success !"){
+        this.toast.success({detail:"SUCCESS",summary:res.Message,duration:5000});
+      this.route.navigate(['login']);
+            this.angForm.reset();
+    }
+    else if(res.Message=="This mail exist!"){
+      this.toast.error({detail:"ERROR",summary:res.Message,duration:5000});
+  }
+  else if(res.Message=="Username is too short."){
+    this.toast.error({detail:"ERROR",summary:res.Message,duration:5000});
+}
+else if(res.Message=="Password is too short."){
+  this.toast.error({detail:"ERROR",summary:res.Message,duration:5000});
+}
+else{
+  this.toast.error({detail:"ERROR",summary:res.Message,duration:5000});
 
+}
     })
    ,error:(err=>{
     alert(err?.error.Message);

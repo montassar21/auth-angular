@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder,FormControl,FormGroup, Validators} from '@angular/forms'
 import {Router} from '@angular/router'
-import { first } from 'rxjs';
 import { UsersService } from '../users.service';
 import { ValidateForm } from 'src/app/helpers/validateform';
+import {NgToastService} from 'ng-angular-popup'
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -17,7 +17,8 @@ loginForm!:FormGroup;
 constructor(
 private fb:FormBuilder,
 private route:Router,
-private auth:UsersService
+private auth:UsersService,
+private toast: NgToastService
 
 )
 {
@@ -30,23 +31,7 @@ email:['',Validators.required],
 password:['',Validators.required]
 })
 }
-// postData(forms:any){
-//   this.checkUser.checkUser(
-//     this.loginForm.value.name,
-//     this.loginForm.value.email,
-//     this.loginForm.value.phone,
-//     this.loginForm.value.password,
-//     ).pipe(first()).subscribe(
-//       (data) =>{
-//         console.log(data);
-//         this.route.navigate(['signup'])
 
-
-//       },error=>{
-
-//       }
-//     );
-//   }
 hideShowPass(){
   this.isText= !this.isText;
   this.isText ? this.eyeIcon="fa-eye": this.eyeIcon="fa-eye-slash"
@@ -58,10 +43,16 @@ onLogin(){
     //send the obj to database
     this.auth.login(this.loginForm.value).subscribe({
       next:(res=>{
-        alert(res.Message);
+        if(res.Message=="Login success !")
+        this.toast.success({detail:"SUCCESS",summary:res.Message,duration:5000});
+         else if(res.Message=="Email does not exist.!")
+         this.toast.error({detail:"ERROR",summary:res.Message,duration:5000});
+         else          this.toast.error({detail:"ERROR",summary:res.Message,duration:5000});
+
+
       }),
       error:(err=>{
-        alert(err.error.Message);
+        this.toast.error({detail:"ERROR",summary:"Something went wrong !",duration:5000});
       })
     })
   }

@@ -39,12 +39,13 @@ hideShowPass(){
 }
 onLogin(){
   if(this.loginForm.valid){
-    console.log(this.loginForm.value)
     //send the obj to database
     this.auth.login(this.loginForm.value).subscribe({
       next:(res=>{
-        if(res.Message=="Login success !")
-        this.toast.success({detail:"SUCCESS",summary:res.Message,duration:5000});
+        if(res.Message=="Login success !"){
+        this.auth.storeToken(res.token);
+        this.route.navigate(['dashboard']);
+        this.toast.success({detail:"SUCCESS",summary:res.Message,duration:5000});}
          else if(res.Message=="Email does not exist.!")
          this.toast.error({detail:"ERROR",summary:res.Message,duration:5000});
          else          this.toast.error({detail:"ERROR",summary:res.Message,duration:5000});
